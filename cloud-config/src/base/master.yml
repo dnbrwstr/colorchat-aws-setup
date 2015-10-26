@@ -1,0 +1,41 @@
+#cloud-config
+
+---
+write-files:
+  - path: /etc/fleet/templates/colorchat@.service
+    permissions: '0644'
+    file: colorchat@.service
+  - path: /etc/fleet/templates/colorchat-sidekick@.service
+    permissions: '0644'
+    file: colorchat-sidekick@.service
+  - path: /etc/confd/conf.d/haproxy.toml
+    permissions: '0755'
+    file: haproxy.toml
+  - path: /etc/confd/templates/haproxy.cfg.tmpl
+    permissions: '0755'
+    file: haproxy.cfg.tmpl
+hostname: master
+coreos:
+  etcd2:
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    advertise-client-urls: http://$private_ipv4:2379,http://$private_ipv4:4001
+    initial-cluster: master=http://$private_ipv4:2380
+    initial-cluster-state: new
+    listen-peer-urls: http://$private_ipv4:2380,http://$private_ipv4:7001
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    name: master
+  units:
+    - name: etcd2.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: docker.service
+      command: start
+    - name: confd.service
+      command: start
+    - name: haproxy.service
+      command: start
+    - name: start-colorchat.service
+      command: start
+  update:
+    reboot-strategy: off

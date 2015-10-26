@@ -1,0 +1,32 @@
+global
+  log 127.0.0.1   local0
+  log 127.0.0.1   local1 notice
+  maxconn 4096
+  tune.ssl.default-dh-param 2048
+
+defaults
+  log     global
+  mode    http
+  option  httplog
+  option  dontlognull
+  option forwardfor
+  option http-server-close
+  timeout connect  5000
+  timeout client  10000
+  timeout server  10000
+
+frontend http-in
+  bind *:80
+  bind *:443 ssl crt /etc/ssl/private/star_color_slow_so.pem ca-file /etc/ssl/private/cabundle.pem
+
+  acl host_colorchat-server hdr(host) -i colorchat-server.color.slow.so
+  use_backend colorchat-server if host_colorchat-server
+
+backend colorchat-server
+  balance leastconn
+  option httpclose
+  option forwardfor
+  cookie SRV_ID prefix
+  {{range gets "/services/colorchat/*"}}
+  server proxy {{.Value}} cookie A check
+  {{end}}

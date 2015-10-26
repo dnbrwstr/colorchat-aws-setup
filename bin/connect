@@ -1,0 +1,2 @@
+echo "Connecting to `terraform output ${1}_ip`"
+ssh core@`terraform output ${1}_ip`

@@ -1,0 +1,2 @@
+terraform taint aws_instance.gateway
+terraform apply

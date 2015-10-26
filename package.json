@@ -1,0 +1,15 @@
+{
+  "name": "colorchat-aws-setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "assemble": "node ./cloud-config/assemble"
+  },
+  "author": "Dan Brewster",
+  "dependencies": {
+    "js-yaml": "^3.4.2",
+    "json2yaml": "^1.0.3",
+    "yamljs": "^0.2.4"
+  }
+}

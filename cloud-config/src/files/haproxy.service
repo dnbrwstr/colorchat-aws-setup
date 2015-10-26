@@ -1,0 +1,18 @@
+[Unit]
+Requires=confd.service
+
+[Service]
+ExecStartPre=/bin/bash -c "\
+  `docker stop proxy` || true; \
+  `docker rm proxy` || true"
+ExecStartPre=/usr/bin/docker pull million12/haproxy:1.5.14
+ExecStart=/usr/bin/docker run \
+-p 80:80 \
+-p 443:443 \
+--name proxy \
+-v /etc/ssl/private:/etc/ssl/private:ro \
+-v /etc/haproxy:/etc/haproxy:ro \
+million12/haproxy:1.5.14
+
+Restart=always
+RestartSec=10

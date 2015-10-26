@@ -1,0 +1,14 @@
+[Unit]
+Requires=fleet.service
+
+[Service]
+ExecStartPre=/usr/bin/bash -c "\
+  mkdir -p /etc/fleet/instances; \
+  ln -s /etc/fleet/templates/colorchat@.service /etc/fleet/instances/colorchat@1.service; \
+  ln -s /etc/fleet/templates/colorchat-sidekick@.service /etc/fleet/instances/colorchat-sidekick@1.service"
+
+ExecStart=/usr/bin/fleetctl start \
+/etc/fleet/instances/colorchat@1.service \
+/etc/fleet/instances/colorchat-sidekick@1.service
+Type=oneshot
+RemainAfterExit=yes

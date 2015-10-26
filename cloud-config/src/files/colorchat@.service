@@ -1,0 +1,25 @@
+[Unit]
+Requires=docker.service
+
+[Service]
+ExecStartPre=/usr/bin/docker pull dnbrwstr/colorchat-server:latest
+ExecStart=/usr/bin/docker run \
+-p 3000:3000 \
+--name colorchat \
+-e "TWILIO_ACCOUNT_SID=${twilio_account_sid}" \
+-e "TWILIO_AUTH_TOKEN=${twilio_auth_token}" \
+-e "TWILIO_NUMBER=${twilio_number}" \
+-e "DATABASE_URL=postgres://${postgres_user}:${postgres_password}@${postgres_endpoint}/${postgres_db}" \
+-e "PARSE_APPLICATION_ID=${parse_application_id}" \
+-e "PARSE_REST_API_KEY=${parse_rest_api_key}" \
+-e "DEFAULT_REGION=US" \
+-e "NODE_ENV=production" \
+-e "PORT=3000" \
+-e "BASE_URL=http://colorchat-server.color.slow.so" \
+-e "REDIS_URL=redis://${redis_endpoint}" \
+dnbrwstr/colorchat-server:latest
+Restart=always
+RestartSec=0
+
+[X-Fleet]
+Conflicts=colorchat@*.service

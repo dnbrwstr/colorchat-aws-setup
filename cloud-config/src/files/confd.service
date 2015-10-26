@@ -1,0 +1,19 @@
+[Unit]
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+
+ExecStartPre=/bin/bash -c "\
+  `docker stop confd` || true; \
+  `docker rm confd` || true"
+ExecStart=/usr/bin/docker run \
+--name confd \
+-v /etc/haproxy:/etc/haproxy \
+-v /etc/confd:/etc/confd \
+dnbrwstr/confd \
+-backend etcd \
+-interval 60 \
+-node $${COREOS_PRIVATE_IPV4}:4001
+Restart=always
+RestartSec=10

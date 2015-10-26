@@ -1,0 +1,27 @@
+[Unit]
+Description=Register ColorChat with etcd
+Requires=etcd2.service
+After=colorchat@%i.service
+BindsTo=colorchat@%i.service
+
+[Service]
+EnvironmentFile=/etc/environment
+
+ExecStart=/bin/bash -c "\
+  etcdctl mkdir /services/colorchat; \
+  while true; do \
+    curl -sI $${COREOS_PRIVATE_IPV4}:3000; \
+    if [ $? -eq 0 ]; then \
+      etcdctl set /services/colorchat/$${COREOS_PRIVATE_IPV4} \
+      '$${COREOS_PRIVATE_IPV4}:3000\' --ttl 30; \
+    else \
+      etcdctl rm /services/colorchat/$${COREOS_PRIVATE_IPV4}; \
+    fi; \
+    sleep 20; \
+  done"
+
+ExecStop=/usr/bin/etcdctl rm /services/colorchat/$${COREOS_PRIVATE_IPV4}
+Restart=always
+RestartSec=10
+[X-Fleet]
+MachineOf=colorchat@%i.service
