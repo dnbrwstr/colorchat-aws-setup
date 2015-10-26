@@ -1,2 +1,3 @@
+npm run-script assemble
 terraform taint aws_instance.gateway
 terraform apply
