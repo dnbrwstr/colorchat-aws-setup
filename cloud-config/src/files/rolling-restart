@@ -1,0 +1,35 @@
+#!/bin/sh
+# Adapted from https://gist.github.com/robtuley/c2cdbabf9aa97c77627b
+
+fleetctl list-units | grep colorchat@ | cut -f1 -d. | while read -r unit ; do
+  unit_index=`echo $unit | cut -f2 -d@`
+
+  printf "unit:> %s index:> %s\n" $unit $unit_index
+
+  printf "stopping:> %s\n" $unit
+  fleetctl stop $unit
+  fleetctl stop colorchat-sidekick@$unit_index
+
+  printf "waiting:> for %s to stop " $unit;
+  is_running=1
+  while [ $is_running -ne 0 ]; do
+    is_running=`fleetctl list-units | grep running | grep $unit | wc -l`;
+    sleep 1;
+    printf ".";
+  done
+  printf "\n"
+
+  printf "starting:> %s\n" $unit
+  fleetctl start $unit
+
+  printf "waiting:> for %s to start " $unit;
+  while [ $is_running -eq 0 ]; do
+    is_running=`fleetctl list-units | grep running | grep $unit | wc -l`;
+    sleep 1;
+    printf ".";
+  done
+  printf "\n"
+
+  fleetctl start colorchat-sidekick@$unit_index
+  fleetctl list-units | grep $unit
+done

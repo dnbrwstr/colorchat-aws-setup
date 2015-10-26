@@ -17,6 +17,9 @@ write-files:
   - path: /opt/bin/rcie
     permissions: '0755'
     file: rcie
+  - path: /opt/bin/rolling-restart
+    permissions: '0755'
+    file: rolling-restart
 hostname: master
 coreos:
   etcd2:
