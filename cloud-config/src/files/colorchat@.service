@@ -3,6 +3,7 @@ Requires=docker.service
 
 [Service]
 ExecStartPre=/usr/bin/docker pull dnbrwstr/colorchat-server:latest
+ExecStartPre=/opt/bin/rcie colorchat
 ExecStart=/usr/bin/docker run \
 -p 3000:3000 \
 --name colorchat \

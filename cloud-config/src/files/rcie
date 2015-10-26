@@ -1,0 +1,4 @@
+#!/bin/bash
+# [r]emove [c]ontainer [i]f [e]xists
+docker stop $1 || echo "Cannot stop ${1}: Container does not exist"
+docker rm $1 || echo "Cannot remove ${1}: Container does not exist"

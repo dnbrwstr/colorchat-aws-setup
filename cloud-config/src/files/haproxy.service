@@ -2,9 +2,7 @@
 Requires=confd.service
 
 [Service]
-ExecStartPre=/bin/bash -c "\
-  `docker stop proxy` || true; \
-  `docker rm proxy` || true"
+ExecStartPre=/opt/bin/rcie proxy
 ExecStartPre=/usr/bin/docker pull million12/haproxy:1.5.14
 ExecStart=/usr/bin/docker run \
 -p 80:80 \

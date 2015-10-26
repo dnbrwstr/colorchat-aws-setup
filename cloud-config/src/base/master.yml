@@ -14,6 +14,9 @@ write-files:
   - path: /etc/confd/templates/haproxy.cfg.tmpl
     permissions: '0755'
     file: haproxy.cfg.tmpl
+  - path: /opt/bin/rcie
+    permissions: '0755'
+    file: rcie
 hostname: master
 coreos:
   etcd2:
