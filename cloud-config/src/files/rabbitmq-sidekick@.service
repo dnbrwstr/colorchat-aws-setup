@@ -1,0 +1,23 @@
+[Unit]
+Description=Register rabbitmq with etcd
+Requires=etcd2.service
+BindsTo=rabbitmq@%i.service
+
+[Service]
+EnvironmentFile=/etc/environment
+ExecStart=/bin/bash -c "\
+  etcdctl mkdir /services/rabbitmq; \
+  while true; do \
+    curl -sI guest:guest@$${COREOS_PRIVATE_IPV4}:15672/api/aliveness-test/%2F; \
+    if [ $? -eq 0 ]; then \
+      etcdctl set /services/rabbitmq/$${COREOS_PRIVATE_IPV4} \
+      $${COREOS_PRIVATE_IPV4}:5672 --ttl 30; \
+    else \
+      etcdctl rm /services/rabbitmq/$${COREOS_PRIVATE_IPV4}; \
+    fi; \
+    sleep 20; \
+  done"
+ExecStop=/usr/bin/etcdctl rm /services/rabbitmq/$${COREOS_PRIVATE_IPV4}
+
+[X-Fleet]
+MachineOf=rabbitmq@%i.service

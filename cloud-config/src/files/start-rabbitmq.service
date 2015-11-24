@@ -1,0 +1,15 @@
+[Unit]
+Requires=fleet.service
+After=media-rabbitmq.mount
+
+[Service]
+ExecStartPre=/usr/bin/bash -c "\
+  mkdir -p /etc/fleet/instances; \
+  ln -s /etc/fleet/templates/rabbitmq@.service /etc/fleet/instances/rabbitmq@1.service; \
+  ln -s /etc/fleet/templates/rabbitmq-sidekick@.service /etc/fleet/instances/rabbitmq-sidekick@1.service"
+ExecStartPre=/usr/bin/fleetctl load \
+/etc/fleet/instances/rabbitmq@1.service \
+/etc/fleet/instances/rabbitmq-sidekick@1.service
+ExecStart=/usr/bin/fleetctl start rabbitmq@1
+Type=oneshot
+RemainAfterExit=yes

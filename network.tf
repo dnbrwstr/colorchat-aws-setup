@@ -26,7 +26,7 @@ resource "aws_subnet" "public_a" {
   cidr_block = "${var.subnet_cidr_a}"
   map_public_ip_on_launch = true
   depends_on = ["aws_internet_gateway.default"]
-  availability_zone = "us-east-1a"
+  availability_zone = "${var.aws_primary_availability_zone}"
   tags {
     Name = "public"
   }
@@ -37,7 +37,7 @@ resource "aws_subnet" "public_b" {
   cidr_block = "${var.subnet_cidr_b}"
   map_public_ip_on_launch = true
   depends_on = ["aws_internet_gateway.default"]
-  availability_zone = "us-east-1b"
+  availability_zone = "${var.aws_secondary_availability_zone}"
   tags {
     Name = "public"
   }

@@ -1,0 +1,4 @@
+init_config:
+
+instances:
+    - url: $private_ipv4:1936

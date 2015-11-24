@@ -15,5 +15,6 @@ resource "template_file" "master_config" {
     twilio_number = "${var.twilio_number}"
     parse_application_id = "${var.parse_application_id}"
     parse_rest_api_key = "${var.parse_rest_api_key}"
+    datadog_api_key = "${var.datadog_api_key}"
   }
 }

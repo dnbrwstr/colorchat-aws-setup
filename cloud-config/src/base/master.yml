@@ -2,6 +2,12 @@
 
 ---
 write-files:
+  - path: /etc/fleet/templates/rabbitmq@.service
+    permissions: '0644'
+    file: rabbitmq@.service
+  - path: /etc/fleet/templates/rabbitmq-sidekick@.service
+    permissions: '0644'
+    file: rabbitmq-sidekick@.service
   - path: /etc/fleet/templates/colorchat@.service
     permissions: '0644'
     file: colorchat@.service
@@ -20,6 +26,15 @@ write-files:
   - path: /opt/bin/rolling-restart
     permissions: '0755'
     file: rolling-restart
+  - path: /opt/dd-agent-conf.d/datadog-haproxy.yaml
+    permissions: '0755'
+    file: datadog-haproxy.yaml
+  - path: /etc/ssl/private/cabundle.pem
+    permissions: 600
+    file: certs/cabundle.pem
+  - path: /etc/ssl/private/star_color_slow_so.pem
+    permissions: 600
+    file: certs/star_color_slow_so.pem
 hostname: master
 coreos:
   etcd2:
@@ -40,6 +55,23 @@ coreos:
     - name: confd.service
       command: start
     - name: haproxy.service
+      command: start
+    - name: datadog-agent.service
+      command: start
+    - name: format-rabbitmq-storage.service
+      command: start
+      content: |
+        [Service]
+        ExecStart=/usr/bin/bash -c "mkfs.btrfs /dev/xvdf || true"
+    - name: media-rabbitmq.mount
+      command: start
+      content: |
+        [Unit]
+        After=format-rabbitmq-storage.service
+        [Mount]
+        What=/dev/xvdf
+        Where=/media/rabbitmq
+    - name: start-rabbitmq.service
       command: start
     - name: start-colorchat.service
       command: start

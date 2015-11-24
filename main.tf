@@ -1,5 +1,15 @@
 variable "aws_key" {}
 variable "aws_secret" {}
+variable "aws_region" {
+  default = "us-east-1"
+}
+variable "aws_primary_availability_zone" {
+  default = "us-east-1a"
+}
+variable "aws_secondary_availability_zone" {
+  default = "us-east-1b"
+}
+variable "datadog_api_key" {}
 variable "twilio_account_sid" {}
 variable "twilio_auth_token" {}
 variable "twilio_number" {}
@@ -15,7 +25,7 @@ variable "coreos_image" {
 provider "aws" {
   access_key = "${var.aws_key}"
   secret_key = "${var.aws_secret}"
-  region = "us-east-1"
+  region = "${var.aws_region}"
 }
 
 resource "aws_route53_record" "gateway-a" {
@@ -37,24 +47,6 @@ resource "aws_instance" "gateway" {
   root_block_device {
     volume_type = "gp2"
     volume_size = 8
-  }
-
-  provisioner "file" {
-    source = "./certs/"
-    destination = "/home/core"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mv /home/core/*.pem /etc/ssl/private"
-    ]
-  }
-
-  connection {
-    type = "ssh"
-    user = "core"
-    host = "${aws_instance.gateway.public_ip}"
-    key_file = "~/.ssh/default.pem"
   }
 }
 
@@ -89,4 +81,18 @@ resource "aws_elasticache_cluster" "default" {
   subnet_group_name = "color-elasticache-subnet"
   security_group_ids = ["${aws_security_group.default.id}"]
   depends_on = ["aws_elasticache_subnet_group.default"]
+}
+
+resource "aws_ebs_volume" "rabbitmq_storage" {
+  availability_zone = "${var.aws_primary_availability_zone}"
+  size = 40
+  tags {
+    Name = "RabbitMQStorage"
+  }
+}
+
+resource "aws_volume_attachment" "rabbitmq_storage_mount" {
+  device_name = "/dev/xvdf"
+  volume_id = "${aws_ebs_volume.rabbitmq_storage.id}"
+  instance_id = "${aws_instance.gateway.id}"
 }

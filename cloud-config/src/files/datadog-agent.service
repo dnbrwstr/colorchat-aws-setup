@@ -1,0 +1,21 @@
+[Unit]
+Requires=docker.service
+
+[Service]
+ExecStartPre=/usr/bin/docker pull datadog/docker-dd-agent:latest
+ExecStartPre=/opt/bin/rcie datadog-agent
+ExecStart=/usr/bin/bash -c '\
+docker run \
+--name datadog-agent \
+-h `hostname` \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /proc/:/host/proc/:ro \
+-v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+-v /opt/dd-agent-conf.d:/conf.d:ro \
+-e API_KEY=${datadog_api_key} \
+datadog/docker-dd-agent:latest'
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
